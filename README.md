@@ -43,10 +43,14 @@ project/
 
 ## API Endpoints
 
-- `POST /api/upload/csv`: Upload and process a CSV file
-- `POST /api/user`: Create a single user
-- `GET /api/user/{user_id}`: Retrieve user by ID
-- `GET /api/users`: Retrieve all users
+- `POST /upload/csv`: Upload and process a CSV file
+- `POST /user`: Create a single user
+- `GET /user/{user_id}`: Retrieve user by ID
+- `GET /users`: Retrieve all users
+- `GET /mongodb/user/{user_id}`: Retrieve user by ID from MongoDB
+- `GET /mongodb/users`: Retrieve all users from MongoDB
+- `GET /sqlite/user/{user_id}`: Retrieve user by ID from SQLite
+- `GET /sqlite/users`: Retrieve all users from SQLite
 
 ## Data Validation
 

@@ -1,6 +1,6 @@
 # app/api/routes.py
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
-from sqlmodel import Session, select
+from sqlmodel import Session, select, col
 from sqlalchemy import Select
 import pandas as pd
 from pydantic import ValidationError
@@ -111,6 +111,39 @@ async def upload_csv(file: UploadFile = File(...), session: Session = Depends(ge
                 detail={
                     "error": "Validation failed",
                     "message": str(e)
+                }
+            )
+
+        # Check for duplicates in MongoDB
+        existing_mongo_users = await UserDocument.find({
+            "$or": [
+                {"user_id": {"$in": [user.user_id for user in user_list.users]}},
+                {"email": {"$in": [user.email for user in user_list.users]}}
+            ]
+        }).to_list()
+
+        if existing_mongo_users:
+            raise HTTPException(
+                status_code=409,
+                detail={
+                    "error": "Duplicate entry",
+                    "message": "Some user IDs or emails already exist in MongoDB"
+                }
+            )
+
+        # Check for duplicates in SQLite
+        statement = select(User).where(
+            (col(User.user_id).in_([user.user_id for user in user_list.users])) |
+            (col(User.email).in_([user.email for user in user_list.users]))
+        )
+        existing_sql_users = session.exec(statement).all()
+
+        if existing_sql_users:
+            raise HTTPException(
+                status_code=409,
+                detail={
+                    "error": "Duplicate entry",
+                    "message": "Some user IDs or emails already exist in SQLite"
                 }
             )
 

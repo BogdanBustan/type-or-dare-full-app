@@ -1,7 +1,7 @@
-# app/api/routes.py
+from typing import Annotated
+
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 from sqlmodel import Session, select, col
-from sqlalchemy import Select
 import pandas as pd
 from pydantic import ValidationError
 import io
@@ -16,7 +16,7 @@ router = APIRouter()
 
 
 @router.get("/user/{user_id}")
-async def get_user(user_id: str, session: Session = Depends(get_session)):
+async def get_user(user_id: str, session: Annotated[Session, Depends(get_session)]):
     # Get from MongoDB
     mongo_user = await UserDocument.find_one({"user_id": user_id})
 

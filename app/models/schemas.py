@@ -38,7 +38,7 @@ class UserResponse(BaseModel):
     name: str
     email: str
     age: int
-    created_at: datetime
+    # created_at: datetime
 
 
 class UserList(BaseModel):

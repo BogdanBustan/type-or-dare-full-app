@@ -60,7 +60,8 @@ async def get_mongodb_user(user_id: str):
 @router.get("/mongodb/users", response_model=list[UserResponse])
 async def get_all_mongodb_users():
     mongo_users = await UserDocument.find_all().to_list()
-    return [UserResponse(**user.model_dump()) for user in mongo_users]
+    # return [UserResponse(**user.model_dump()) for user in mongo_users]
+    return mongo_users
 
 
 # SQLite endpoints
@@ -70,15 +71,16 @@ async def get_sqlite_user(user_id: str, session: Session = Depends(get_session))
     sql_user = session.exec(statement).first()
     if not sql_user:
         raise HTTPException(status_code=404, detail="User not found in SQLite")
-    return UserResponse(**sql_user.model_dump())
+    # return UserResponse(**sql_user.model_dump())
+    return sql_user
 
 
 @router.get("/sqlite/users", response_model=list[UserResponse])
 async def get_all_sqlite_users(session: Session = Depends(get_session)):
     statement = select(User)
     sql_users = session.exec(statement).all()
-    return [UserResponse(**user.model_dump()) for user in sql_users]
-
+    # return [UserResponse(**user.model_dump()) for user in sql_users]
+    return sql_users
 
 @router.post("/upload/csv")
 async def upload_csv(file: UploadFile = File(...), session: Session = Depends(get_session)):
@@ -188,7 +190,7 @@ async def upload_csv(file: UploadFile = File(...), session: Session = Depends(ge
         )
 
 
-@router.post("/user", response_model=UserData)
+@router.post("/user", response_model=UserResponse)
 async def create_user(user_data: UserData, session: Session = Depends(get_session)):
     try:
         # Check if user_id or email already exists in MongoDB
